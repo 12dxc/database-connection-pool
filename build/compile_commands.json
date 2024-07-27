@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/ubuntu/sqlConnPool/build",
+  "command": "/usr/bin/clang++ -g -std=gnu++20 -o CMakeFiles/test.dir/connection.o -c /home/ubuntu/sqlConnPool/connection.cpp",
+  "file": "/home/ubuntu/sqlConnPool/connection.cpp"
+},
+{
+  "directory": "/home/ubuntu/sqlConnPool/build",
+  "command": "/usr/bin/clang++ -g -std=gnu++20 -o CMakeFiles/test.dir/sql_connection_pool.o -c /home/ubuntu/sqlConnPool/sql_connection_pool.cpp",
+  "file": "/home/ubuntu/sqlConnPool/sql_connection_pool.cpp"
+},
+{
+  "directory": "/home/ubuntu/sqlConnPool/build",
+  "command": "/usr/bin/clang++ -g -std=gnu++20 -o CMakeFiles/test.dir/sqlconfig.o -c /home/ubuntu/sqlConnPool/sqlconfig.cpp",
+  "file": "/home/ubuntu/sqlConnPool/sqlconfig.cpp"
+},
+{
+  "directory": "/home/ubuntu/sqlConnPool/build",
+  "command": "/usr/bin/clang++ -g -std=gnu++20 -o CMakeFiles/test.dir/test.o -c /home/ubuntu/sqlConnPool/test.cpp",
+  "file": "/home/ubuntu/sqlConnPool/test.cpp"
+}
+]

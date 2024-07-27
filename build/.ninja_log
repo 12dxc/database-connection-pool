@@ -1,0 +1,10 @@
+# ninja log v5
+2470	2585	1722008450308361061	test	fa90d9ef8d2a5aab
+0	5	0	clean	a31eedcededa8236
+1	1383	1722008449100360791	CMakeFiles/test.dir/connection.cpp.o	d3406b5152780ff7
+0	1155	1722008574068388862	CMakeFiles/test.dir/test.cpp.o	e63f3225f9205fde
+1	1390	1722008763848432349	CMakeFiles/test.dir/sql_connection_pool.cpp.o	d66773accfdf5e9a
+1	1356	1722012841868969836	CMakeFiles/test.dir/sql_connection_pool.o	69d0cae6542aaaa4
+687	836	1722012308912822727	../test	70a1e4d726f54eba
+0	811	1722012658096919331	CMakeFiles/test.dir/connection.o	968be9397b3dc840
+1	1775	1722012666320921586	CMakeFiles/test.dir/test.o	d50c2a4250a1eb11

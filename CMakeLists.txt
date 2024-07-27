@@ -1,5 +1,6 @@
 project(test)
 set(CMAKE_CXX_STANDARD 20)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 aux_source_directory(. SRC)
 add_executable(test ${SRC})
 target_link_libraries(test mysqlclient)
