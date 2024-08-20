@@ -1,3 +1,0 @@
-/home/ubuntu/sqlConnPool/build/CMakeFiles/test.dir
-/home/ubuntu/sqlConnPool/build/CMakeFiles/edit_cache.dir
-/home/ubuntu/sqlConnPool/build/CMakeFiles/rebuild_cache.dir
