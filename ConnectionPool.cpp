@@ -1,4 +1,4 @@
-﻿#include "sql_connection_pool.h"
+﻿#include "ConnectionPool.h"
 #include "public.h"
 
 #include <cerrno>
@@ -21,15 +21,14 @@ ConnectionPool::ConnectionPool()
 {
     // 加载配置项了
     if (!sqlconfig_.loadConfigFile())
-    {
         return;
-    }
 
     // 创建初始数量的连接
     for (int i = 0; i != sqlconfig_.init_size(); ++i)
     {
         Connection *p = new Connection();
-        p->connect(sqlconfig_.ip(), sqlconfig_.username(), sqlconfig_.passwd(), sqlconfig_.dbname(), sqlconfig_.port());
+        p->connect(sqlconfig_.ip(), sqlconfig_.port(), sqlconfig_.username(), sqlconfig_.passwd(), sqlconfig_.dbname());
+
         p->refreshAliveTime(); // 刷新开始空闲的起始时间
         conn_que_.push(p);
         ++conn_cnt_;
@@ -57,8 +56,7 @@ void ConnectionPool::produceConnectionTask()
         if (conn_cnt_ < sqlconfig_.max_size())
         {
             Connection *p = new Connection();
-            p->connect(sqlconfig_.ip(), sqlconfig_.username(), sqlconfig_.passwd(), sqlconfig_.dbname(),
-                       sqlconfig_.port());
+            p->connect(sqlconfig_.ip(), sqlconfig_.port(), sqlconfig_.username(), sqlconfig_.passwd(), sqlconfig_.dbname());
             p->refreshAliveTime();
             conn_que_.push(p);
             ++conn_cnt_;
@@ -87,11 +85,11 @@ std::shared_ptr<Connection> ConnectionPool::getConnection()
     }
 
     // 自定义智能指针删除器，让其不要调用析构函数而是放回池中继续使用
-    std::shared_ptr<Connection> sp(conn_que_.front(), [&](Connection *pcon) {
+    std::shared_ptr<Connection> sp(conn_que_.front(), [&](Connection *pcon)
+                                   {
         std::unique_lock<std::mutex> lock(que_mutex_);
         pcon->refreshAliveTime();
-        conn_que_.push(pcon);
-    });
+        conn_que_.push(pcon); });
     conn_que_.pop();
     cond_.notify_all(); // 消费完连接后，通知生产者线程
 
@@ -118,7 +116,7 @@ void ConnectionPool::scannerConnectionTask()
             }
             else
             {
-                break; //队头的连接都没超过maxIdleTime_，其他连接肯定也没有
+                break; // 队头的连接都没超过maxIdleTime_，其他连接肯定也没有
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "connection.h"
-#include "sqlconfig.h"
+#include "Connection.h"
+#include "SqlConfig.h"
 
 #include <atomic>
 #include <condition_variable>

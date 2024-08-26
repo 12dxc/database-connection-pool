@@ -1,4 +1,4 @@
-#include "sqlconfig.h"
+#include "SqlConfig.h"
 using std::string;
 
 // 从配置文件中加载配置项
