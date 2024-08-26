@@ -1,7 +1,9 @@
 #pragma once
+#include "SqlConfig.h"
 #include <ctime>
 #include <mysql/mysql.h>
 #include <string>
+
 using namespace std;
 
 /*
@@ -15,7 +17,7 @@ public:
     // 释放数据库连接资源
     ~Connection();
     // 连接数据库
-    bool connect(string ip, unsigned short port, string user, string password, string dbname);
+    bool connect(SqlConfig &sqlConfig);
     // 更新操作 insert、delete、update
     bool update(string sql);
     // 查询操作 select

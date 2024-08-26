@@ -2,10 +2,10 @@
 using std::string;
 
 // 从配置文件中加载配置项
-bool SqlConfig::loadConfigFile()
+bool SqlConfig::loadConfigFile(std::string filename)
 {
     FILE *pf = nullptr;
-    pf = fopen("mysql.ini", "r");
+    pf = fopen(filename.c_str(), "r");
     if (pf == nullptr)
     {
         perror("fopen");
