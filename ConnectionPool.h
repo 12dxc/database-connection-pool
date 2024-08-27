@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Connection.h"
 #include "SqlConfig.h"

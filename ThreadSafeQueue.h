@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <expected>
 #include <mutex>
+#include <optional>
 #include <queue>
 
 // 加锁的并发安全队列
@@ -32,14 +33,15 @@ public:
         return std::move(data_queue_.front());
     }
 
-    bool tryPop(T &value)
+    std::optional<T> tryPop()
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex>
+            lock(mutex_);
         if (data_queue_.empty())
-            return false;
-        value = std::move(data_queue_.front());
+            return std::nullopt;
+        T val = data_queue_.front();
         data_queue_.pop();
-        return true;
+        return val;
     }
 
     bool empty() const

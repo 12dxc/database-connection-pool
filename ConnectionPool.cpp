@@ -1,4 +1,4 @@
-﻿#include "ConnectionPool.h"
+#include "ConnectionPool.h"
 #include "log.h"
 
 #include <string>
@@ -18,7 +18,7 @@ ConnectionPool::ConnectionPool()
 {
     // 加载配置项
     if (!sqlconfig_.loadConfigFile())
-        return;
+        minilog::info("数据库配置加载失败");
 
     // 创建初始数量的连接
     for (int i = 0; i != sqlconfig_.init_size(); ++i)
@@ -32,36 +32,10 @@ ConnectionPool::ConnectionPool()
     }
 
     // 启动一个新的线程，作为连接的生产者
-    std::thread produce(std::bind(&ConnectionPool::produceConnectionTask, this));
-    produce.detach();
+    std::jthread produce(std::bind(&ConnectionPool::produceConnectionTask, this));
 
     // 启动一个新的定时线程，扫描超过maxIdleTime时间的空闲连接，对于多余的连接进行回收
-    std::thread scanner(std::bind(&ConnectionPool::scannerConnectionTask, this));
-    scanner.detach();
-}
-
-// 运行在独立的线程中，专门负责生成新连接
-void ConnectionPool::produceConnectionTask()
-{
-    while (1)
-    {
-        std::unique_lock<std::mutex> lock(que_mutex_);
-        while (!conn_que_.empty())
-            cond_.wait(lock); // 队列不空，此处生产者线程进入等待状态
-
-        // 连接数量未达到上限，继续创建新连接
-        if (conn_cnt_ < sqlconfig_.max_size())
-        {
-            Connection *p = new Connection();
-            p->connect(sqlconfig_);
-            p->refreshAliveTime();
-            conn_que_.push(p);
-            ++conn_cnt_;
-        }
-
-        // 通知消费者线程，可以消费连接了
-        cond_.notify_all();
-    }
+    std::jthread scanner(std::bind(&ConnectionPool::scannerConnectionTask, this));
 }
 
 // 给外部提供接口，从连接池获取一个可用的空闲连接
@@ -93,6 +67,30 @@ std::shared_ptr<Connection> ConnectionPool::getConnection()
     cond_.notify_all(); // 消费完连接后，通知生产者线程
 
     return sp;
+}
+
+// 运行在独立的线程中，专门负责生成新连接
+void ConnectionPool::produceConnectionTask()
+{
+    while (1)
+    {
+        std::unique_lock<std::mutex> lock(que_mutex_);
+        while (!conn_que_.empty())
+            cond_.wait(lock); // 队列不空，此处生产者线程进入等待状态
+
+        // 连接数量未达到上限，继续创建新连接
+        if (conn_cnt_ < sqlconfig_.max_size())
+        {
+            Connection *p = new Connection();
+            p->connect(sqlconfig_);
+            p->refreshAliveTime();
+            conn_que_.push(p);
+            ++conn_cnt_;
+        }
+
+        // 通知消费者线程，可以消费连接了
+        cond_.notify_all();
+    }
 }
 
 // 扫描超过maxIdleTime时间的空闲连接，对于多余的连接进行回收

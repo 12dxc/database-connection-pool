@@ -1,6 +1,6 @@
-﻿#include "ConnectionPool.h"
+#include "ConnectionPool.h"
+#include <print>
 
-#include <iostream>
 using namespace std;
 
 void mysql_update();
@@ -36,7 +36,7 @@ int main()
 #endif
 
     clock_t end = clock();
-    // cout << (end - begin) << "ms" << endl;
+    std::println("{}ms", end - begin);
 
     return 0;
 }
