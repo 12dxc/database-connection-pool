@@ -2,24 +2,27 @@
 #include "log.h"
 using namespace std;
 
+// 初始化数据库连接
 Connection::Connection()
+    : conn_(mysql_init(nullptr)),
+      alivetime_(clock())
 {
-    // 初始化数据库连接
-    _conn = mysql_init(nullptr);
 }
 
 Connection::~Connection()
 {
     // 释放数据库连接资源
-    if (_conn != nullptr)
-        mysql_close(_conn);
+    if (conn_ != nullptr)
+    {
+        mysql_close(conn_);
+    }
 }
 
-bool Connection::connect(SqlConfig &sqlConfig)
+auto Connection::connect(SqlConfig &sqlConfig) -> bool
 {
     // 连接数据库
     MYSQL *p =
-        mysql_real_connect(_conn,
+        mysql_real_connect(conn_,
                            sqlConfig.ip().c_str(),
                            sqlConfig.username().c_str(),
                            sqlConfig.passwd().c_str(),
@@ -29,10 +32,10 @@ bool Connection::connect(SqlConfig &sqlConfig)
     return p != nullptr;
 }
 
-bool Connection::update(string sql)
+auto Connection::update(const string &sql) -> bool
 {
     // 更新操作 insert、delete、update
-    if (mysql_query(_conn, sql.c_str()))
+    if (mysql_query(conn_, sql.c_str()) != 0)
     {
         minilog::info("更新失败:" + sql);
         return false;
@@ -40,13 +43,13 @@ bool Connection::update(string sql)
     return true;
 }
 
-MYSQL_RES *Connection::query(string sql)
+auto Connection::query(const string &sql) -> MYSQL_RES *
 {
     // 查询操作 select
-    if (mysql_query(_conn, sql.c_str()))
+    if (mysql_query(conn_, sql.c_str()) != 0)
     {
         minilog::info("查询失败:" + sql);
         return nullptr;
     }
-    return mysql_use_result(_conn);
+    return mysql_use_result(conn_);
 }

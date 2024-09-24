@@ -6,15 +6,15 @@ using namespace std;
 void mysql_update();
 
 // sql指令
-std::string sql = "insert into score(name,math,english,chinese) value(zhangSan,90, 78, 60)";
+const std::string sql = "insert into score(name,math,english,chinese) value(zhangSan,90, 78, 60)";
 
-int main()
+auto main() -> int
 {
     clock_t begin = clock();
 
     // 单线程连接对比
 #if 1
-    ConnectionPool *cp = ConnectionPool::getConnectionPool(); // 线程池单例
+    ConnectionPool &cp = ConnectionPool::getConnectionPool(); // 线程池单例
     // for (int i = 0; i < 10000; ++i)
     // {
     //     // 使用连接池测试
@@ -43,7 +43,7 @@ int main()
 
 void mysql_update()
 {
-    ConnectionPool *cp = ConnectionPool::getConnectionPool(); // 线程池单例
+    ConnectionPool &cp = ConnectionPool::getConnectionPool(); // 线程池单例
     for (int i = 0; i < 2500; ++i)
     {
         // 批量单连接测试
@@ -52,7 +52,7 @@ void mysql_update()
         conn.update(sql);*/
 
         // 使用连接池测试
-        std::shared_ptr<Connection> sp = cp->getConnection();
+        std::shared_ptr<Connection> sp = cp.getConnection();
         sp->update(sql);
     }
 }

@@ -1,26 +1,29 @@
 #include "SqlConfig.h"
+#include <cstddef>
 using std::string;
 
 // 从配置文件中加载配置项
-bool SqlConfig::loadConfigFile(std::string filename)
+auto SqlConfig::loadConfigFile(const string &filename) -> bool
 {
     FILE *pf = nullptr;
-    pf = fopen(filename.c_str(), "r");
+    pf = fopen(filename.c_str(), "re");
     if (pf == nullptr)
     {
         perror("fopen");
-        return 1;
+        return true;
     }
 
-    while (!feof(pf))
+    while (feof(pf) == 0)
     {
         char line[1024] = {};
         fgets(line, 1024, pf);
         string str = line;
         int idx = str.find('=', 0);
-        if (idx == -1) // 无效配置项
+        if (idx == -1)
+        { // 无效配置项
             continue;
-        int end_idx = str.find('\n', idx);
+        }
+        size_t end_idx = str.find('\n', idx);
         string key = str.substr(0, idx);
         string val = str.substr(idx + 1, end_idx - idx - 1);
 
@@ -32,43 +35,43 @@ bool SqlConfig::loadConfigFile(std::string filename)
     return true;
 }
 
-string SqlConfig::ip()
+auto SqlConfig::ip() -> string
 {
     return ip_;
 }
-unsigned short SqlConfig::port()
+auto SqlConfig::port() const -> uint16_t
 {
     return port_;
 }
-string SqlConfig::username()
+auto SqlConfig::username() -> string
 {
     return username_;
 }
-string SqlConfig::passwd()
+auto SqlConfig::passwd() -> string
 {
     return passwd_;
 }
-string SqlConfig::dbname()
+auto SqlConfig::dbname() -> string
 {
     return dbname_;
 }
 // 初始连接量
-int SqlConfig::init_size()
+auto SqlConfig::init_size() const -> int
 {
     return init_size_;
 }
 // 最大连接量
-int SqlConfig::max_size()
+auto SqlConfig::max_size() const -> int
 {
     return max_size_;
 }
 // 最大空闲时间
-int SqlConfig::max_idle_time()
+auto SqlConfig::max_idle_time() const -> int
 {
     return max_idle_time_;
 }
 // 获取连接的超时时间
-int SqlConfig::conn_timeout()
+auto SqlConfig::conn_timeout() const -> int
 {
     return conn_timeout_;
 }

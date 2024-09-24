@@ -1,7 +1,11 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.20)
+
 project(test)
+
 set(CMAKE_CXX_STANDARD 23)
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
+
 aux_source_directory(. SRC)
-add_executable(test ${SRC})
-target_link_libraries(test stdc++exp mysqlclient)
+
+add_executable(${PROJECT_NAME} ${SRC})
+
+target_link_libraries(${PROJECT_NAME} stdc++exp mysqlclient)

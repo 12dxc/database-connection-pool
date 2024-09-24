@@ -1,0 +1,25 @@
+Hover:
+  ShowAKA: Yes
+  
+# 开启诊断程序
+Diagnostics:
+  ClangTidy:
+    Add: ["*"]
+    Remove:
+    [
+      abseil*,
+      altera*,
+      fuchsia*,
+      llvmlib*,
+      zircon*,
+      google-readability-todo,
+      readability-braces-around-statements,
+      hicpp-braces-around-statements,
+      misc-unused*
+    ]
+    CheckOptions:
+      WarnOnFloatingPointNarrowingConversion: false  # 不警告窄化转换
+
+# 编译选项
+CompileFlags:
+  Add: [-xc++,-std=c++23,-D__cpp_concepts=202002L,-Wall,-Wextra]

@@ -1,6 +1,8 @@
 #pragma once
+#include <cstdint>
 #include <functional>
 #include <string>
+#include <sys/types.h>
 #include <unordered_map>
 
 /* 数据库配置信息类 */
@@ -9,36 +11,36 @@ class SqlConfig
 public:
     SqlConfig() = default;
     // 从配置文件中加载配置项
-    bool loadConfigFile(std::string filename = "mysql.ini");
+    auto loadConfigFile(const std::string &filename = "mysql.ini") -> bool;
 
-    std::string ip();
-    unsigned short port();
-    std::string username();
-    std::string passwd();
-    std::string dbname();
+    auto ip() -> std::string;
+    auto port() const -> uint16_t;
+    auto username() -> std::string;
+    auto passwd() -> std::string;
+    auto dbname() -> std::string;
 
     // 初始连接量
-    int init_size();
+    auto init_size() const -> int;
     // 最大连接量
-    int max_size();
+    auto max_size() const -> int;
     // 最大空闲时间
-    int max_idle_time();
+    auto max_idle_time() const -> int;
     // 获取连接的超时时间
-    int conn_timeout();
+    auto conn_timeout() const -> int;
 
 private:
     // mysql的连接信息
     std::string ip_;
-    unsigned short port_;
+    uint16_t port_{};
     std::string username_;
     std::string passwd_;
     std::string dbname_;
 
     // mysql的连接配置项
-    int init_size_;     // 初始连接量
-    int max_size_;      // 最大连接量
-    int max_idle_time_; // 最大空闲时间
-    int conn_timeout_;  // 获取连接的超时时间
+    int init_size_{};     // 初始连接量
+    int max_size_{};      // 最大连接量
+    int max_idle_time_{}; // 最大空闲时间
+    int conn_timeout_{};  // 获取连接的超时时间
 
     // 配置项映射表，用于简化操作
     std::unordered_map<std::string, std::function<void(const std::string &)>> config_handlers_ = {

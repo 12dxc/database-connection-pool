@@ -16,25 +16,32 @@ public:
     Connection();
     // 释放数据库连接资源
     ~Connection();
+
     // 连接数据库
-    bool connect(SqlConfig &sqlConfig);
+    auto connect(SqlConfig &sqlConfig) -> bool;
     // 更新操作 insert、delete、update
-    bool update(string sql);
+    auto update(const string &sql) -> bool;
     // 查询操作 select
-    MYSQL_RES *query(string sql);
+    auto query(const string &sql) -> MYSQL_RES *;
 
     // 刷新一下连接的起始的空闲时间点
     void refreshAliveTime()
     {
-        _alivetime = clock();
+        alivetime_ = clock();
     }
     // 返回存活的时间
-    clock_t getAliveTime() const
+    [[nodiscard]] auto getAliveTime() const -> clock_t
     {
-        return clock() - _alivetime;
+        return clock() - alivetime_;
     }
 
+    // 复制移动删除构造函数
+    Connection(Connection &) = delete;
+    Connection(Connection &&) = delete;
+    auto operator=(const Connection &) = delete;
+    auto operator=(const Connection &&) = delete;
+
 private:
-    MYSQL *_conn;       // 表示和MySQL Server的一条连接
-    clock_t _alivetime; // 记录进入空闲状态后的起始存活时间
+    MYSQL *conn_;       // 表示和MySQL Server的一条连接
+    clock_t alivetime_; // 记录进入空闲状态后的起始存活时间
 };

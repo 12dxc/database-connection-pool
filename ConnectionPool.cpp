@@ -6,11 +6,12 @@
 
 using std::string;
 
-// 获取连接池对象实例  线程安全的懒汉单例模式
-ConnectionPool *ConnectionPool::getConnectionPool()
+// 获取连接池对象实例
+auto ConnectionPool::getConnectionPool() -> ConnectionPool &
 {
-    static ConnectionPool pool; // 静态自动进行lock和unlock
-    return &pool;
+    // C++11局部静态变量只会初始化一次，以此来实现单例
+    static ConnectionPool pool;
+    return pool;
 }
 
 // 连接池的构造
@@ -18,12 +19,14 @@ ConnectionPool::ConnectionPool()
 {
     // 加载配置项
     if (!sqlconfig_.loadConfigFile())
+    {
         minilog::info("数据库配置加载失败");
+    }
 
     // 创建初始数量的连接
     for (int i = 0; i != sqlconfig_.init_size(); ++i)
     {
-        Connection *p = new Connection();
+        auto *p = new Connection();
         p->connect(sqlconfig_);
 
         p->refreshAliveTime(); // 刷新开始空闲的起始时间
@@ -32,10 +35,12 @@ ConnectionPool::ConnectionPool()
     }
 
     // 启动一个新的线程，作为连接的生产者
-    std::jthread produce(std::bind(&ConnectionPool::produceConnectionTask, this));
+    std::jthread produce([this]
+                         { produceConnectionTask(); });
 
     // 启动一个新的定时线程，扫描超过maxIdleTime时间的空闲连接，对于多余的连接进行回收
-    std::jthread scanner(std::bind(&ConnectionPool::scannerConnectionTask, this));
+    std::jthread scanner([this]
+                         { scannerConnectionTask(); });
 }
 
 // 给外部提供接口，从连接池获取一个可用的空闲连接
@@ -76,12 +81,14 @@ void ConnectionPool::produceConnectionTask()
     {
         std::unique_lock<std::mutex> lock(que_mutex_);
         while (!conn_que_.empty())
+        {
             cond_.wait(lock); // 队列不空，此处生产者线程进入等待状态
+        }
 
         // 连接数量未达到上限，继续创建新连接
         if (conn_cnt_ < sqlconfig_.max_size())
         {
-            Connection *p = new Connection();
+            auto *p = new Connection();
             p->connect(sqlconfig_);
             p->refreshAliveTime();
             conn_que_.push(p);
@@ -96,7 +103,7 @@ void ConnectionPool::produceConnectionTask()
 // 扫描超过maxIdleTime时间的空闲连接，对于多余的连接进行回收
 void ConnectionPool::scannerConnectionTask()
 {
-    while (1)
+    while (true)
     {
         // 通过sleep模拟定时效果
         std::this_thread::sleep_for(std::chrono::seconds(sqlconfig_.max_idle_time()));
