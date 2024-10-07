@@ -5,6 +5,7 @@
 #include <print>
 #include <queue>
 
+// 调用智能指针返回值的标签
 enum class WaitPopRetPtr : int8_t
 {
     ptr
@@ -34,9 +35,9 @@ public:
         std::unique_lock lock(mux_);
         cond_.wait(lock, [this]
                    { return !que_.empty(); });
-        T ret = std::move(que_.front());
+        T res = std::move(que_.front());
         que_.pop();
-        return ret;
+        return res;
     }
 
     auto waitPop(WaitPopRetPtr ret_ptr) -> std::shared_ptr<T>
@@ -57,9 +58,9 @@ public:
         {
             return std::nullopt;
         }
-        T ret = move(que_.front());
+        T res = move(que_.front());
         que_.pop();
-        return ret;
+        return res;
     }
 
     auto tryPop(WaitPopRetPtr ret_ptr) -> std::optional<std::shared_ptr<T>>
