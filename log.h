@@ -1,11 +1,13 @@
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <ctime>
 #include <format>
 #include <print>
 #include <source_location>
 #include <sstream>
+#include <string>
 #include <string_view>
 
 namespace minilog
@@ -13,7 +15,7 @@ namespace minilog
     namespace detail
     {
         // 日志等级
-        enum class LogLevel : uint8_t
+        enum class LogLevel
         {
             DEBUG,
             INFO,
@@ -22,7 +24,7 @@ namespace minilog
         };
 
         // 日志等级打印字符串
-        constexpr std::string_view level_strings[] = {
+        const std::array<std::string_view, sizeof(LogLevel)> level_strings = {
             "DEBUG",
             "INFO",
             "ERROR",
@@ -30,7 +32,7 @@ namespace minilog
         };
 
         // 日志等级颜色
-        constexpr const char *level_colors[] = {
+        const std::array<std::string_view, sizeof(LogLevel)> level_colors = {
             "\033[32m", // 绿色
             "\033[36m", // 青色
             "\033[31m", // 红色
@@ -38,35 +40,33 @@ namespace minilog
         };
 
         template <LogLevel level>
-        inline void logImpl(std::string msg, std::source_location sl)
+        inline void logImpl(const std::string &msg, const std::source_location &sl)
         {
-            auto logEntry = [&]()
-            {
-                std::ostringstream ss;
-                const auto now = std::chrono::system_clock::now();
-                const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
-                ss << std::put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S");
+            using namespace std;
 
-                // 格式化日志等级
-                std::string str_level =
-                    std::format("{}[{}]{}",
-                                level_colors[(uint8_t)level],
-                                level_strings[(uint8_t)level],
-                                "\033[0m");
+            ostringstream oss;
+            const auto now = chrono::system_clock::now();
+            const time_t t_c = chrono::system_clock::to_time_t(now);
+            oss << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S");
 
-                // 格式化错误信息
-                std::string str_message =
-                    std::format("{}:{} {} : {}",
-                                sl.file_name(),
-                                sl.line(),
-                                ss.str(),
-                                msg);
+            // 格式化日志等级
+            string str_level = format(
+                "{}[{}]{}",
+                level_colors[(uint8_t)level],
+                level_strings[(uint8_t)level],
+                "\033[0m");
 
-                println("{} {}", str_level, str_message);
-            };
-            logEntry();
+            // 格式化错误信息
+            string str_message = format(
+                "{}:{} {} : {}",
+                sl.file_name(),
+                sl.line(),
+                oss.str(),
+                msg);
+
+            println("{} {}", str_level, str_message);
         }
-    }
+    } // namespace detail
 
     inline void debug(std::string msg, std::source_location sl = std::source_location::current())
     {
