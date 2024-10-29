@@ -26,8 +26,8 @@ public:
             const CSimpleIniA::TKeyVal *pKeyVal = ini.GetSection(it.pItem);
 
             if (nullptr != pKeyVal)
-                for (const auto &it : *pKeyVal)
-                    m_.emplace(it.first.pItem, it.second);
+                for (const auto &[key,val] : *pKeyVal)
+                    m_.emplace(key.pItem, val);
         }
 
         return true;

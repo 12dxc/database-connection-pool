@@ -15,16 +15,16 @@ int main()
     for (int i = 0; i < 10000; ++i)
     {
         // 使用连接池测试
-        std::shared_ptr<Connection> sp = cp.getConnection();
+        shared_ptr<Connection> sp = cp.getConnection();
         sp->update(sql);
     }
 #endif
     // 四线程连接对比
 #if 0
-    std::thread t1(mysql_update);
-    std::thread t2(mysql_update);
-    std::thread t3(mysql_update);
-    std::thread t4(mysql_update);
+    thread t1(mysql_update);
+    thread t2(mysql_update);
+    thread t3(mysql_update);
+    thread t4(mysql_update);
 
     t1.join();
     t2.join();
@@ -33,7 +33,7 @@ int main()
 #endif
 
     clock_t end = clock();
-    std::println("{}ms", end - begin);
+    println("{}ms", end - begin);
 
     return 0;
 }
